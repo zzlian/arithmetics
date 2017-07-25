@@ -56,6 +56,7 @@ public class Cart {
     }
 
 
+
     //先序遍历决策树，输出节点属性
     public static void printNode(Node node){
         if(node.getAttribute().equals("leafNode")){
