@@ -37,6 +37,7 @@ public class Classify {
             i++;
         }
 
+
         //将新加入的点到各个类中的点的距离进行排序
         for(ArrayList<Double> dk:ds){
             Collections.sort(dk);
