@@ -1,6 +1,6 @@
 package ExtraTrees;
 
-import Tool_Cart.Gini;
+import Tool_Cart.SplitAttr;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,13 +8,13 @@ import java.util.Collections;
 /**
  * Created by lenovo on 2017/7/20.
  */
-public class ExtraDivGini extends Gini {
+public class ExtraDivGini extends SplitAttr {
 
     public ExtraDivGini(ArrayList<ArrayList<Double>> datas,ArrayList<String> attributes){
         super(datas,attributes);
     }
 
-    public ArrayList<Double> minGini(int indexAttr){
+    public ArrayList<Double> splitA(int indexAttr){
         ArrayList<Double> attrValues=new ArrayList<Double>();
         ArrayList<Double> gini_diValue=new ArrayList<Double>();
         double gi;
@@ -47,9 +47,7 @@ public class ExtraDivGini extends Gini {
             }
         }
 
-        /*System.out.println(attributes.get(indexAttr)+"---index---"+rdIndex);*/
-
-        gi=attrGini(attrValues,rdIndex,indexAttr);
+        gi=getSE(attrValues,rdIndex,indexAttr);
         gini_diValue.add(gi);
         gini_diValue.add(attrValues.get(rdIndex));
         return gini_diValue;

@@ -7,14 +7,21 @@ import java.util.ArrayList;
  */
 public class Node {
 
-    //用attribute来保存节点的分裂属性
-    //用childNodes来保存节点的子节点
-    //用diviValue来保存节点分裂点的值
-    private String attribute;
-    private double diviValue=0.0;
-    private ArrayList<Node> childNodes=new ArrayList<Node>();
-    private Double label;
+    private String attribute;     //保存节点的分裂属性
+    private double diviValue=0.0;  //保存节点分裂点的值
+    private ArrayList<Node> childNodes=new ArrayList<Node>();    //保存节点的子节点
+    private Double result;
 
+
+    private  ArrayList<ArrayList<Double>> datas;
+
+    public ArrayList<ArrayList<Double>> getDatas() {
+        return this.datas;
+    }
+
+    public void setDatas(ArrayList<ArrayList<Double>> datas) {
+        this.datas = datas;
+    }
 
     public void setAttribute(String attribute){
         this.attribute=attribute;
@@ -41,12 +48,12 @@ public class Node {
         this.diviValue= value;
     }
 
-    public void setLabel(double label){
-        this.label=label;
+    public void setResult(double label){
+        this.result=label;
     }
 
-    public double getLabel(){
-        return this.label;
+    public double getResult(){
+        return this.result;
     }
 
     public void addChildNode(Node node){

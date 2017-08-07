@@ -16,14 +16,14 @@ public class AdaBoost {
         TreeMap<Double,Node> weight_nodes=new TreeMap<Double,Node>();
         ArrayList<ArrayList<Double>> creatDatas=new ArrayList<ArrayList<Double>>();
         ArrayList<ArrayList<Double>> textDatas=new ArrayList<ArrayList<Double>>();
-        TreeMap<Double,ArrayList<ArrayList<Double>>> label_datas;
+        TreeMap<Double,ArrayList<ArrayList<Double>>> result_datas;
         ArrayList<String> attributes=new ArrayList<String>();
         CreatAdaBoost creatAB=new CreatAdaBoost();
         ArrayList<Integer> counts=new ArrayList<Integer>();
         int count;
         String creatFile="C:/Users/lenovo/Desktop/abalone.data";
         String textFile="C:/Users/lenovo/Desktop/abalone.data";
-        int k=10;
+        int k=5;
 
         counts.add(0);
         counts.add(0);
@@ -40,16 +40,16 @@ public class AdaBoost {
         LoadDatas.loadDatas(textDatas,new ArrayList<String>(),textFile);
 
         //将测试数据进行分类
-        label_datas=Classify_AdaB.classifyDatas_AdaB(weight_nodes,textDatas,attributes,counts);
+        result_datas=Classify_AdaB.classifyDatas_AdaB(weight_nodes,textDatas,attributes,counts);
 
         count=counts.get(0)+counts.get(1);
         System.out.println("分类正确率为："+(double)counts.get(0)/(double)count);
 
         int i=0;
         System.out.println("分类结果为：");
-        for(double label:label_datas.keySet()){
+        for(double label:result_datas.keySet()){
             System.out.print("标签为"+label+"对应的数据个数为：");
-            System.out.print(label_datas.get(label).size()+"\t\t\t");
+            System.out.print(result_datas.get(label).size()+"\t\t\t");
             i++;
             if(i%2==0){
                 System.out.println();
@@ -69,7 +69,7 @@ public class AdaBoost {
     //遍历决策树的每个节点
     public static void printNodes(Node node){
         if(node.getAttribute().equals("leafNode")){
-            System.out.println(node.getLabel());
+            System.out.println(node.getResult());
             return;
         }
 

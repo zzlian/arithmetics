@@ -85,21 +85,23 @@ public class CreatAdaBoost extends CreatDecisionTree_Cart {
         return datas;
     }
 
-    //以生成的决策树对原训练集的数据进行测试，计算错误率
-    //在该决策树的错误率小于0.5的情况下，计算返回该决策树的决策权重，该决策树构建完成
-    //若错误率大于等于0.5，返回0，重构该决策树
+    /*
+    *以生成的决策树对原训练集的数据进行测试，计算错误率
+    *在该决策树的错误率小于0.5的情况下，计算返回该决策树的决策权重，该决策树构建完成
+    *若错误率大于等于0.5，返回0，重构该决策树
+    */
     public double getTreeWeight(Node node,ArrayList<ArrayList<Double>> datas,ArrayList<String> attributes,ArrayList<Double> dataWs){
         ArrayList<Integer> errorCorrect=new ArrayList<Integer>();
         int sizeD=datas.get(0).size();
         double weight=0.0;
         double mt=0.0;
-        double label;
+        double result;
         int i=0;
 
         //判断数据分类是否正确，进行标记，同时计算错误率
         for(ArrayList<Double> data:datas){
-            label= Classify_Cart.classifyData(node,data,attributes);
-            if(label==data.get(sizeD-1)){
+            result=Classify_Cart.classifyData(node,data,attributes);
+            if(result >= data.get(sizeD-1) - 2 && result <= data.get(sizeD-1) + 2){
                 errorCorrect.add(0);
             }
             else{

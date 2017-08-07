@@ -12,16 +12,25 @@ public class ClassifyData {
 
     //单个新数据的测试分类
     public static double classifyData(ArrayList<Node> nodes,ArrayList<Double> data,ArrayList<String> attributes){
-        double label;
-        ArrayList<Double> labels=new ArrayList<Double>();
+        double result;
+        int treeNum = nodes.size();
+        ArrayList<Double> results=new ArrayList<Double>();
 
         //将数据在没一棵决策树上进行测试，得到k个标签
         for(Node node:nodes){
-            label= Classify_Cart.classifyData(node, (ArrayList<Double>) data.clone(), (ArrayList<String>) attributes.clone());
-            labels.add(label);
+            result= Classify_Cart.classifyData(node, (ArrayList<Double>) data.clone(), (ArrayList<String>) attributes.clone());
+            results.add(result);
         }
 
-        //将测试返回的不同标签保存起来
+        result = 0.0;
+        for(double r : results){
+            result = result + r;
+        }
+        return result / treeNum;
+    }
+
+
+    public static double getLabel(ArrayList<Double> labels){
         ArrayList<Integer> counts=new ArrayList<Integer>();
         ArrayList<Double> difLabels=new ArrayList<Double>();
         for(double lab:labels){
@@ -38,7 +47,7 @@ public class ClassifyData {
                 if(lab1==lab2){
                     counts.set(i,counts.get(i)+1);
                 }
-        }
+            }
             i++;
         }
 

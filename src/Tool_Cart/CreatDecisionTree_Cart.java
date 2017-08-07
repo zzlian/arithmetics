@@ -11,51 +11,62 @@ public class CreatDecisionTree_Cart {
     public Node creatDecisionTree(ArrayList<ArrayList<Double>> datas, ArrayList<String> attributes){
         Node node=new Node();
         Double label=0.0;
+        double result;
 
         label=isPure(datas);
 
         //若节点中的数据属于同一标签，则贴上标签，作为叶节点返回
         if(label!=-1.0){
+            result = getResult(datas);
             node.setAttribute("leafNode");
-            node.setLabel(label);
+            node.setResult(result);
             return node;
         }
         //当节点中的数据少于指定阈值时，贴上多类标签，作为叶节点返回
-        else if(datas.size()<5){
+        else if(datas.size()<50){
+            result = getResult(datas);
             node.setAttribute("leafNode");
-            label=maLabel(datas);
-            node.setLabel(label);
+            node.setResult(result);
             return node;
         }
         //创建子节点
         else{
-            ArrayList<ArrayList<Double>> gini_diValues=new ArrayList<ArrayList<Double>>();
-            ArrayList<Double> gini_diValue=new ArrayList<Double>();
-            Gini gini=new Gini(datas,attributes);
+            ArrayList<ArrayList<Double>> sE_diValues=new ArrayList<ArrayList<Double>>();
+            ArrayList<Double> sE_diValue=new ArrayList<Double>();
+            SplitAttr splitAttr=new SplitAttr(datas,attributes);
             int i=0;
 
             //计算得到所有属性的所有划分中的最小基尼指数和分裂点
             for(String attr:attributes){
-                gini_diValue=gini.minGini(i);
-                gini_diValues.add((ArrayList<Double>) gini_diValue.clone());
+                sE_diValue=splitAttr.split(i);
+                sE_diValues.add((ArrayList<Double>) sE_diValue.clone());
                 i++;
             }
 
             //得到最小基尼指数的属性的索引
             i=0;
             int j=0;
-            double gi=gini_diValues.get(0).get(0);
-            for(ArrayList<Double> gi_dv:gini_diValues){
-                if(gi>gi_dv.get(0)){
-                    gi=gi_dv.get(0);
+            double sE=sE_diValues.get(0).get(0);
+            for(ArrayList<Double> gi_dv:sE_diValues){
+                if(sE>gi_dv.get(0)){
+                    sE=gi_dv.get(0);
                     j=i;
                 }
                 i++;
             }
 
+            //当平方残差小于某一阈值时，停止分裂
+            if(sE < 200){
+                result = getResult(datas);
+                node.setAttribute("leafNode");
+                node.setResult(result);
+                return node;
+            }
+
+
             //设置属性和分裂点
             node.setAttribute(attributes.get(j));
-            node.setDiviValue(gini_diValues.get(j).get(1));
+            node.setDiviValue(sE_diValues.get(j).get(1));
 
             //依据分裂点将数据分成两部分
             ArrayList<ArrayList<ArrayList<Double>>> childDatas=new ArrayList<ArrayList<ArrayList<Double>>>();
@@ -91,6 +102,20 @@ public class CreatDecisionTree_Cart {
             return -1.0;
         }
         return labels.get(0);
+    }
+
+
+    //计算叶子节点数据集各属性的平均值
+    public double getResult(ArrayList<ArrayList<Double>> datas){
+        double mV = 0;
+        int dataNum = datas.size();
+        int lastIndex = datas.get(0).size() - 1;
+
+        for(ArrayList<Double> data : datas){
+            mV = mV +data.get(lastIndex);
+        }
+        mV = mV / dataNum;
+        return mV;
     }
 
     //返回数据中出现次数最多的标签

@@ -25,58 +25,62 @@ public class CreatExtraTrees extends CreatDecisionTree_Cart {
 
     public Node creatDecisionTree(ArrayList<ArrayList<Double>> datas,ArrayList<String> attributes){
         Node node=new Node();
-        Double label=0.0;
-
-        /*System.out.println("datas-----"+datas);*/
+        double label=0.0;
+        double result;
 
         label=isPure(datas);
 
         //若节点中的数据属于同一标签，则贴上标签，作为叶节点返回
         if(label!=-1.0){
+            result = getResult(datas);
             node.setAttribute("leafNode");
-            node.setLabel(label);
+            node.setResult(result);
             return node;
         }
-        /*//当节点中的数据少于指定阈值时，贴上多类标签，作为叶节点返回
-        else if(datas.size()<5){
+        //当节点中的数据少于指定阈值时，贴上多类标签，作为叶节点返回
+        else if(datas.size()<50){
+            result = getResult(datas);
             node.setAttribute("leafNode");
-            label=maLabel(datas);
-            node.setLabel(label);
+            node.setResult(result);
             return node;
-        }*/
+        }
         //创建子节点
         else{
-            ArrayList<ArrayList<Double>> gini_diValues=new ArrayList<ArrayList<Double>>();
-            ArrayList<Double> gini_diValue=new ArrayList<Double>();
-            ExtraDivGini gini=new ExtraDivGini(datas,attributes);
+            ArrayList<ArrayList<Double>> sE_diValues=new ArrayList<ArrayList<Double>>();
+            ArrayList<Double> sE_diValue=new ArrayList<Double>();
+            ExtraDivGini splitAttr=new ExtraDivGini(datas,attributes);
             int i=0;
 
             //计算得到所有属性的所有划分中的最小基尼指数和分裂点
             for(String attr:attributes){
-                gini_diValue=gini.minGini(i);
-                gini_diValues.add((ArrayList<Double>) gini_diValue.clone());
+                sE_diValue=splitAttr.splitA(i);
+                sE_diValues.add((ArrayList<Double>) sE_diValue.clone());
                 i++;
             }
 
             //得到最小基尼指数的属性的索引
             i=0;
             int j=0;
-            double gi=gini_diValues.get(0).get(0);
-            for(ArrayList<Double> gi_dv:gini_diValues){
-                if(gi>gi_dv.get(0)){
-                    gi=gi_dv.get(0);
+            double sE=sE_diValues.get(0).get(0);
+            for(ArrayList<Double> sE_dv:sE_diValues){
+                if(sE>sE_dv.get(0)){
+                    sE=sE_dv.get(0);
                     j=i;
                 }
                 i++;
             }
 
+            //当平方残差小于某一阈值时，停止分裂
+            if(sE < 200){
+                result = getResult(datas);
+                node.setAttribute("leafNode");
+                node.setResult(result);
+                return node;
+            }
+
             //设置属性和分裂点
             node.setAttribute(attributes.get(j));
-            node.setDiviValue(gini_diValues.get(j).get(1));
-
-            /*System.out.println("attrs----"+attributes);
-            System.out.println("attr----"+node.getAttribute());
-            System.out.println("divivalue----"+node.getDiviValue()+"\n");*/
+            node.setDiviValue(sE_diValues.get(j).get(1));
 
             //依据分裂点将数据分成两部分
             ArrayList<ArrayList<ArrayList<Double>>> childDatas=new ArrayList<ArrayList<ArrayList<Double>>>();

@@ -41,12 +41,6 @@ public class RandomForest {
         //读取测试数据
         LoadDatas.loadDatas(textDatas,new ArrayList<String>(),textFile);
 
-        //中序遍历每棵树的所有节点属性
-        /*for(Node nod:nodes){
-            putNode(nod);
-            System.out.println();
-        }*/
-
 
         //多个数据的测试
         label_datas=ClassifyDatas.classifyDatas(nodes,textDatas,attributes,counts);

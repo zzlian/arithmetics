@@ -19,7 +19,7 @@ public class Cart {
         ArrayList<ArrayList<Double>> creatDatas=new ArrayList<ArrayList<Double>>();
         ArrayList<ArrayList<Double>> textDatas=new ArrayList<ArrayList<Double>>();
         ArrayList<String> attributes=new ArrayList<String>();
-        TreeMap<Double,ArrayList<ArrayList<Double>>> label_datas;
+        TreeMap<Double,ArrayList<ArrayList<Double>>> result_datas;
         CreatDecisionTree_Cart creatDC=new CreatDecisionTree_Cart();
         ArrayList<Integer> counts=new ArrayList<Integer>();
         int count;
@@ -41,16 +41,16 @@ public class Cart {
         LoadDatas.loadDatas(textDatas,new ArrayList<String>(),textFile);
 
         //将数据分类
-        label_datas= Classify_Cart.classifyDatas(node, (ArrayList<ArrayList<Double>>) textDatas.clone(),attributes,counts);
+        result_datas= Classify_Cart.classifyDatas(node, (ArrayList<ArrayList<Double>>) textDatas.clone(),attributes,counts);
 
         count=counts.get(0)+counts.get(1);
         System.out.println("分类正确率为："+(double)counts.get(0)/(double)count);
 
         int i=0;
         System.out.println("分类结果为：");
-        for(double key:label_datas.keySet()){
+        for(double key:result_datas.keySet()){
             System.out.print("标签为"+key);
-            System.out.println("对应的数据个数为："+label_datas.get(key).size());
+            System.out.println("对应的数据个数为："+result_datas.get(key).size());
             i++;
         }
     }

@@ -11,16 +11,16 @@ public class Classify_Cart {
 
     //将多个数据进行分类，并将分类结果保存在TreeMap中返回
     public static TreeMap classifyDatas(Node node, ArrayList<ArrayList<Double>> datas, ArrayList<String> attributes,ArrayList<Integer> counts){
-        TreeMap<Double,ArrayList<ArrayList<Double>>> label_datas=new TreeMap<Double,ArrayList<ArrayList<Double>>>();
-        double label;
+        TreeMap<Double,ArrayList<ArrayList<Double>>> result_datas=new TreeMap<Double,ArrayList<ArrayList<Double>>>();
+        double result;
 
         int flag=0;
         for(ArrayList<Double> data:datas){
             //得到单个数据的标签
-            label=classifyData(node,(ArrayList<Double>)data.clone(), (ArrayList<String>) attributes.clone());
+            result=classifyData(node,(ArrayList<Double>)data.clone(), (ArrayList<String>) attributes.clone());
 
             //记录样本被正确和错误分类的个数
-            if(label==data.get(data.size()-1)){
+            if(result >= data.get(data.size()-1) - 2 && result <= data.get(data.size()-1) + 2){
                 counts.set(0,counts.get(0)+1);
             }
             else{
@@ -28,9 +28,9 @@ public class Classify_Cart {
             }
 
             //按标签进行分类
-            for(double key:label_datas.keySet()){
-                if(key==label){
-                    label_datas.get(key).add((ArrayList<Double>) data.clone());
+            for(double key:result_datas.keySet()){
+                if(key==result){
+                    result_datas.get(key).add((ArrayList<Double>) data.clone());
                     flag=1;
                     break;
                 }
@@ -39,10 +39,10 @@ public class Classify_Cart {
             if(flag==0) {
                 ArrayList<ArrayList<Double>> label_data = new ArrayList<ArrayList<Double>>();
                 label_data.add((ArrayList<Double>) data.clone());
-                label_datas.put(label, label_data);
+                result_datas.put(result, label_data);
             }
         }
-        return label_datas;
+        return result_datas;
 
     }
 
@@ -50,11 +50,11 @@ public class Classify_Cart {
     public static double classifyData(Node node, ArrayList<Double> data, ArrayList<String> attributes){
         String nodeAttr=node.getAttribute();
         int indexAttr=0;
-        double label;
+        double result;
 
         //若节点为叶子节点，返回节点的标签
         if(node.getAttribute().equals("leafNode")){
-            return node.getLabel();
+            return node.getResult();
         }
 
         //得到节点中划分属性在属性列表中的索引
@@ -78,8 +78,8 @@ public class Classify_Cart {
         }
 
         //递归寻找数据对应的标签
-        label=classifyData(childNode,data,attributes);
+        result=classifyData(childNode,data,attributes);
 
-        return label;
+        return result;
     }
 }

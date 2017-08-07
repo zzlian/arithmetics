@@ -6,18 +6,18 @@ import java.util.Collections;
 /**
  * Created by lenovo on 2017/7/18.
  */
-public class Gini {
+public class SplitAttr {
 
     public ArrayList<ArrayList<Double>> datas;
     public ArrayList<String> attributes;
 
-    public Gini(ArrayList<ArrayList<Double>> datas, ArrayList<String> attributes){
+    public SplitAttr(ArrayList<ArrayList<Double>> datas, ArrayList<String> attributes){
         this.datas= (ArrayList<ArrayList<Double>>) datas.clone();
         this.attributes= (ArrayList<String>) attributes.clone();
     }
 
     //返回该属性划分的最小基尼指数和分裂点
-    public ArrayList<Double> minGini(int indexAttr){
+    public ArrayList<Double> split(int indexAttr){
         ArrayList<Double> attrValues=new ArrayList<Double>();
         ArrayList<Double> ginis=new ArrayList<Double>();
         ArrayList<Double> gini_diValue=new ArrayList<Double>();
@@ -42,7 +42,7 @@ public class Gini {
         //得到各个划分的基尼指数，将其保存在ginis中
         int i=0;
         while(i<(attrValues.size()-1)){
-            gi=attrGini(attrValues,i,indexAttr);
+            gi=getSE(attrValues,i,indexAttr);
             ginis.add(gi);
             i++;
         }
@@ -50,12 +50,6 @@ public class Gini {
         //得到最小的划分基尼指数和对应的索引
         i=0;
         int j=0;
-
-        /*System.out.println("attrValues----"+attrValues.size());
-        System.out.println("index---"+indexAttr);
-        System.out.println("attrs---"+attributes);
-        System.out.println("dattas---"+datas+"\n");*/
-
         gi=ginis.get(0);
         for(double g:ginis){
             if(gi>g){
@@ -70,6 +64,54 @@ public class Gini {
         gini_diValue.add((attrValues.get(j)+attrValues.get(j+1))/2);
         return (ArrayList<Double>) gini_diValue.clone();
     }
+
+    //计算单个划分的平方残差
+    public double getSE(ArrayList<Double> attrValues,int indexValue,int indexAttr){
+        ArrayList<ArrayList<Double>> datas1 = new ArrayList<ArrayList<Double>>();
+        ArrayList<ArrayList<Double>> datas2 = new ArrayList<ArrayList<Double>>();
+        double diValue=attrValues.get(indexValue);
+        double mV1 = 0.0,mV2 = 0.0;
+        double sE = 0.0;
+        int dataNum = 0;
+        int resultIndex = datas.get(0).size() - 1;
+
+        //按分裂点将数据划分为两个区域
+        for(ArrayList<Double> data:datas){
+            if(data.get(indexAttr)<=diValue){
+                datas1.add(data);
+            }
+            else{
+                datas2.add(data);
+            }
+        }
+
+        //计算数据子集的均值
+        for(ArrayList<Double> data : datas1){
+            dataNum ++;
+            mV1 = mV1 + data.get(resultIndex);
+        }
+        mV1 = mV1 / dataNum;
+
+        dataNum = 0;
+        for(ArrayList<Double> data : datas2){
+            dataNum ++;
+            mV2 = mV2 + data.get(resultIndex);
+        }
+        mV2 = mV2 / dataNum;
+
+        //计算平方残差
+        for(ArrayList<Double> data : datas1){
+            sE = sE + Math.pow(mV1 - data.get(resultIndex),2.0);
+        }
+        for(ArrayList<Double> data : datas2){
+            sE = sE + Math.pow(mV2 - data.get(resultIndex),2.0);
+        }
+
+        return sE;
+    }
+
+
+
 
     //计算属性单个划分的基尼指数
     public double attrGini(ArrayList<Double> attrValues,int indexValue,int indexAttr){

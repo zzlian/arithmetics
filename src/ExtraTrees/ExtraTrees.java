@@ -25,7 +25,7 @@ public class ExtraTrees {
         String creatFile="C:/Users/lenovo/Desktop/abalone.data";
         String textFile="C:/Users/lenovo/Desktop/abalone.data";
         double label=0;
-        int k=2;
+        int k=10;
 
         counts.add(0);
         counts.add(0);
@@ -58,19 +58,12 @@ public class ExtraTrees {
             }
         }
 
-
-        //遍历每棵树的每个节点
-        /*for(Node node:nodes){
-            putNode(node);
-            System.out.println();
-        }*/
-
     }
 
     public static void putNode(Node node){
         if(node.getAttribute().equals("leafNode")||node.getChildNodes().size()==0){
             System.out.println("leafNode");
-            System.out.println(node.getLabel());
+            System.out.println(node.getResult());
             return;
         }
 

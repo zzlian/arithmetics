@@ -3,7 +3,7 @@ package Random_Forest;
 import java.util.ArrayList;
 import Tool_Cart.CreatDecisionTree_Cart;
 import Tool_Cart.Node;
-import Tool_Cart.Gini;
+import Tool_Cart.SplitAttr;
 
 
 /**
@@ -43,29 +43,31 @@ public class CreatRandomForest extends CreatDecisionTree_Cart {
     public Node creatDecisionTree(ArrayList<ArrayList<Double>> datask, ArrayList<String> attributes){
         Node node=new Node();
         double label=0.0;
+        double result;
 
         //判断节点中数据的标签是否一致
         label=isPure(datask);
 
         //在标签一致时，将该节点设置在叶子节点
         if(label!=-1.0){
+            result = getResult(datask);
             node.setAttribute("leafNode");
-            node.setLabel(label);
+            node.setResult(result);
             return node;
         }
         //当节点数据少于某一指定阈值时，停止分裂，将该节点设为叶子节点，贴上多类标签
-        /*else if(datask.size()<3){
-            label=maLabel(datask);
+        else if(datask.size()<50){
+            result = getResult(datask);
             node.setAttribute("leafNode");
-            node.setLabel(label);
+            node.setResult(result);
             return node;
-        }*/
+        }
         //递归构建决策树
         else {
             ArrayList<Integer> indexAttrs = new ArrayList<Integer>();
-            ArrayList<ArrayList<Double>> gini_diValues = new ArrayList<ArrayList<Double>>();
-            ArrayList<Double> gini_diValue;
-            Gini gini = new Gini(datask, attributes);
+            ArrayList<ArrayList<Double>> sE_diValues = new ArrayList<ArrayList<Double>>();
+            ArrayList<Double> sE_diValue;
+            SplitAttr splitA = new SplitAttr(datask, attributes);
             int sizeAttr = attributes.size();
             int indexAttr = 0;
             int i = 0;
@@ -74,41 +76,52 @@ public class CreatRandomForest extends CreatDecisionTree_Cart {
             while (i < (sizeAttr / 2)) {
                 indexAttr = (int) (sizeAttr * Math.random());
                 if (!indexAttrs.contains(indexAttr)) {
-                    gini_diValue = gini.minGini(indexAttr);
-                    if(gini_diValue.get(0)==1.0){
+                    sE_diValue = splitA.split(indexAttr);
+                    if(sE_diValue.get(0)==1.0){
                         continue;
                     }
-                    gini_diValues.add((ArrayList<Double>) gini_diValue.clone());
+                    sE_diValues.add((ArrayList<Double>) sE_diValue.clone());
                     indexAttrs.add(indexAttr);
                     i++;
                 }
             }
             //当节点中的属性只有一个的时候，将该属性作为分裂属性
             if (sizeAttr == 1) {
-                gini_diValue = gini.minGini(0);
+                sE_diValue = splitA.split(0);
                 indexAttrs.add(0);
-                gini_diValues.add((ArrayList<Double>) gini_diValue.clone());
+                sE_diValues.add((ArrayList<Double>) sE_diValue.clone());
             }
 
             //比较被选取的属性的最优划分的基尼指数，选取具有最小基尼指数的属性
-            gini_diValue = gini_diValues.get(0);
+            sE_diValue = sE_diValues.get(0);
             indexAttr = indexAttrs.get(0);
+            double sE = sE_diValues.get(0).get(0);
             i = 0;
-            for (ArrayList<Double> gi_dv : gini_diValues) {
-                if (gini_diValue.get(0) > gi_dv.get(0)) {
-                    gini_diValue = gi_dv;
+            for (ArrayList<Double> sE_dv : sE_diValues) {
+                if (sE_diValue.get(0) > sE_dv.get(0)) {
+                    sE = sE_dv.get(0);
+                    sE_diValue = sE_dv;
                     indexAttr = indexAttrs.get(i);
                 }
                 i++;
             }
 
+            //当最小平方残差小于某一阈值时，停止分裂
+            if(sE <= 200){
+                result = getResult(datask);
+                node.setAttribute("leafNode");
+                node.setResult(result);
+                return node;
+            }
+
+
             //设置节点分裂属性和分裂点
             node.setAttribute(attributes.get(indexAttr));
-            node.setDiviValue(gini_diValue.get(1));
+            node.setDiviValue(sE_diValue.get(1));
 
             //依据分裂属性将节点数据分为两个子数据
             ArrayList<ArrayList<ArrayList<Double>>> childDatas;
-            childDatas = creatChildDatas(datask, gini_diValue.get(1), indexAttr);
+            childDatas = creatChildDatas(datask, sE_diValue.get(1), indexAttr);
 
             //递归生成子树
             i=0;
